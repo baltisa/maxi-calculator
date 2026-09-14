@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Макси — Калькулятор сборщика</title>
   
-  <!-- PWA настройки -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -95,7 +94,7 @@
       border: none;
       color: #94a3b8;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
@@ -171,8 +170,12 @@
       margin-top: 10px;
     }
 
-    .btn:active {
-      background: #0369a1;
+    .btn-save {
+      background: #16a34a;
+    }
+
+    .btn-save:active {
+      background: #15803d;
     }
 
     .user-banner {
@@ -200,7 +203,7 @@
     }
 
     .results {
-      margin-top: 20px;
+      margin-top: 16px;
       display: none;
       background: #0f172a;
       padding: 16px;
@@ -251,6 +254,61 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
+    /* Календарь */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .cal-day-header {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: bold;
+      padding-bottom: 4px;
+    }
+
+    .cal-cell {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 6px 4px;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .cal-cell.empty {
+      background: transparent;
+      border: none;
+    }
+
+    .cal-cell.ok {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .cal-cell.bad {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .cal-date {
+      font-weight: bold;
+      color: #cbd5e1;
+    }
+
+    .cal-info {
+      font-size: 0.65rem;
+      color: #38bdf8;
+      text-align: center;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -260,13 +318,11 @@
 
   <div class="card">
     
-    <!-- Информационная панель даты и времени -->
     <div class="datetime-bar">
       <span>📅 <span id="currentDate">-- --- ----</span></span>
       <span>🕒 <span id="currentTime">--:--</span></span>
     </div>
 
-    <!-- ЭКРАН 1: АВТОРИЗАЦИЯ -->
     <div id="authScreen">
       <div class="header">
         <h1>Доставка «Макси»</h1>
@@ -281,7 +337,6 @@
       </form>
     </div>
 
-    <!-- ЭКРАН 2: КАЛЬКУЛЯТОР -->
     <div id="calcScreen" class="hidden">
       
       <div class="user-banner">
@@ -295,6 +350,7 @@
       <div class="tabs">
         <button class="tab-btn active" id="tabDayBtn" onclick="switchTab('day')">Смена (День)</button>
         <button class="tab-btn" id="tabMonthBtn" onclick="switchTab('month')">Итоги месяца</button>
+        <button class="tab-btn" id="tabCalBtn" onclick="switchTab('cal')">Календарь</button>
       </div>
 
       <!-- Вкладка 1: СМЕНА -->
@@ -333,40 +389,47 @@
             <span class="res-value" id="dayResDiff">0</span>
           </div>
           <div id="dayStatusBadge" class="status-badge"></div>
+          
+          <button type="button" class="btn btn-save" onclick="saveShiftToCalendar()">💾 Сохранить смену в календарь</button>
         </div>
       </div>
 
-      <!-- Вкладка 2: ИТОГИ МЕСЯЦА -->
+      <!-- Вкладка 2: ИТОГИ МЕСЯЦА (АВТОМАТИЧЕСКИЕ) -->
       <div id="monthTab" class="hidden">
-        <form id="monthForm">
-          <div class="form-group">
-            <label for="monthHours">Всего часов за месяц</label>
-            <input type="number" id="monthHours" step="0.1" min="0.1" placeholder="например, 160">
+        <div id="monthResultsBlock" style="background: #0f172a; padding: 16px; border-radius: 12px; border: 1px solid #334155;">
+          <div class="res-row">
+            <span class="res-label">Отработано дней:</span>
+            <span class="res-value" id="mTotalDays">0 дн.</span>
           </div>
-
-          <div class="form-group">
-            <label for="monthLines">Всего строк за месяц</label>
-            <input type="number" id="monthLines" min="0" placeholder="например, 6400">
+          <div class="res-row">
+            <span class="res-label">Всего часов:</span>
+            <span class="res-value" id="mTotalHours">0 ч</span>
           </div>
-
-          <button type="submit" class="btn">Рассчитать месяц</button>
-        </form>
-
-        <div id="monthResults" class="results">
+          <div class="res-row">
+            <span class="res-label">Всего строк:</span>
+            <span class="res-value" id="mTotalLines">0 стр</span>
+          </div>
+          <hr style="border: 0; border-top: 1px solid #334155; margin: 12px 0;">
           <div class="res-row">
             <span class="res-label">Средняя скорость:</span>
-            <span class="res-value" id="monthResSpeed">0 стр/час</span>
+            <span class="res-value" id="mAvgSpeed">0 стр/ч</span>
           </div>
           <div class="res-row">
             <span class="res-label">Целевая норма:</span>
-            <span class="res-value" style="color: #38bdf8;">40.0 стр/час</span>
+            <span class="res-value" style="color: #38bdf8;">40.0 стр/ч</span>
           </div>
           <div class="res-row">
             <span class="res-label">Разница:</span>
-            <span class="res-value" id="monthResDiff">0</span>
+            <span class="res-value" id="mDiff">0</span>
           </div>
-          <div id="monthStatusBadge" class="status-badge"></div>
+          <div id="mStatusBadge" class="status-badge"></div>
         </div>
+      </div>
+
+      <!-- Вкладка 3: КАЛЕНДАРЬ -->
+      <div id="calTab" class="hidden">
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #38bdf8;" id="calMonthTitle"></div>
+        <div class="calendar-grid" id="calendarGrid"></div>
       </div>
 
     </div>
@@ -375,8 +438,8 @@
 
   <script>
     const TARGET_SPEED = 40.0;
+    let currentShiftData = null;
 
-    // Обновление даты и времени
     function updateDateTime() {
       const now = new Date();
       const options = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -390,7 +453,6 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Авторизация
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('maxi_picker_user');
       if (savedUser) {
@@ -411,6 +473,8 @@
       document.getElementById('displayUserName').textContent = userName;
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('calcScreen').classList.remove('hidden');
+      renderMonthSummary();
+      renderCalendar();
     }
 
     function logout() {
@@ -419,27 +483,32 @@
       document.getElementById('calcScreen').classList.add('hidden');
     }
 
-    // Переключение вкладок
     function switchTab(tab) {
       const dayTab = document.getElementById('dayTab');
       const monthTab = document.getElementById('monthTab');
+      const calTab = document.getElementById('calTab');
+      
       const tabDayBtn = document.getElementById('tabDayBtn');
       const tabMonthBtn = document.getElementById('tabMonthBtn');
+      const tabCalBtn = document.getElementById('tabCalBtn');
+
+      [dayTab, monthTab, calTab].forEach(el => el.classList.add('hidden'));
+      [tabDayBtn, tabMonthBtn, tabCalBtn].forEach(el => el.classList.remove('active'));
 
       if (tab === 'day') {
         dayTab.classList.remove('hidden');
-        monthTab.classList.add('hidden');
         tabDayBtn.classList.add('active');
-        tabMonthBtn.classList.remove('active');
-      } else {
+      } else if (tab === 'month') {
+        renderMonthSummary();
         monthTab.classList.remove('hidden');
-        dayTab.classList.add('hidden');
-        tabDayBtn.classList.add('active');
-        tabDayBtn.classList.remove('active');
+        tabMonthBtn.classList.add('active');
+      } else if (tab === 'cal') {
+        renderCalendar();
+        calTab.classList.remove('hidden');
+        tabCalBtn.classList.add('active');
       }
     }
 
-    // Быстрые кнопки добавления строк
     function addDayLines(count) {
       const dayLinesInput = document.getElementById('dayLines');
       let currentVal = parseInt(dayLinesInput.value, 10) || 0;
@@ -450,56 +519,158 @@
       document.getElementById('dayLines').value = 0;
     }
 
-    // Расчет дневной смены
     document.getElementById('dayForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const lines = parseInt(document.getElementById('dayLines').value, 10) || 0;
       const hours = parseFloat(document.getElementById('dayHours').value) || 0;
 
       if (hours > 0) {
-        calculateAndDisplay(lines, hours, 'dayResSpeed', 'dayResDiff', 'dayStatusBadge', 'dayResults', 'сегодня');
+        const speed = lines / hours;
+        const diff = speed - TARGET_SPEED;
+
+        document.getElementById('dayResSpeed').textContent = `${speed.toFixed(1)} стр/ч`;
+
+        const diffElem = document.getElementById('dayResDiff');
+        const badgeElem = document.getElementById('dayStatusBadge');
+
+        if (speed >= TARGET_SPEED) {
+          badgeElem.className = 'status-badge status-ok';
+          badgeElem.textContent = `Норма за сегодня выполнена!`;
+          diffElem.textContent = `+${diff.toFixed(1)} стр/ч`;
+          diffElem.style.color = '#4ade80';
+        } else {
+          badgeElem.className = 'status-badge status-bad';
+          const linesNeeded = Math.ceil((TARGET_SPEED * hours) - lines);
+          badgeElem.textContent = `Отставание от нормы. Не хватает ${linesNeeded} строк.`;
+          diffElem.textContent = `${diff.toFixed(1)} стр/ч`;
+          diffElem.style.color = '#f87171';
+        }
+
+        currentShiftData = { lines, hours, speed };
+        document.getElementById('dayResults').style.display = 'block';
       }
     });
 
-    // Расчет месяца
-    document.getElementById('monthForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const lines = parseInt(document.getElementById('monthLines').value, 10) || 0;
-      const hours = parseFloat(document.getElementById('monthHours').value) || 0;
-
-      if (hours > 0) {
-        calculateAndDisplay(lines, hours, 'monthResSpeed', 'monthResDiff', 'monthStatusBadge', 'monthResults', 'месяц');
-      }
-    });
-
-    // Общая функция вычислений
-    function calculateAndDisplay(lines, hours, speedId, diffId, badgeId, blockId, periodName) {
-      const speed = lines / hours;
-      const speedFormatted = speed.toFixed(1);
-      const diff = speed - TARGET_SPEED;
-
-      document.getElementById(speedId).textContent = `${speedFormatted} стр/ч`;
-
-      const diffElem = document.getElementById(diffId);
-      const badgeElem = document.getElementById(badgeId);
-
-      if (speed >= TARGET_SPEED) {
-        badgeElem.className = 'status-badge status-ok';
-        badgeElem.textContent = `Норма за ${periodName} выполнена!`;
-        diffElem.textContent = `+${diff.toFixed(1)} стр/ч`;
-        diffElem.style.color = '#4ade80';
-      } else {
-        badgeElem.className = 'status-badge status-bad';
-        const linesNeeded = Math.ceil((TARGET_SPEED * hours) - lines);
-        badgeElem.textContent = `Отставание от нормы. Не хватает ${linesNeeded} строк.`;
-        diffElem.textContent = `${diff.toFixed(1)} стр/ч`;
-        diffElem.style.color = '#f87171';
-      }
-
-      document.getElementById(blockId).style.display = 'block';
+    // СОХРАНЕНИЕ СМЕНЫ В КАЛЕНДАРЬ
+    function saveShiftToCalendar() {
+      if (!currentShiftData) return;
+      
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      
+      let shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+      shifts[dateKey] = currentShiftData;
+      
+      localStorage.setItem('maxi_shifts', JSON.stringify(shifts));
+      alert('Смена успешно сохранена в календарь и итоговую статистику!');
     }
 
-    // Регистрация PWA Service Worker
+    // РАСЧЕТ ИТОГОВ МЕСЯЦА ПО ДАННЫМ ИЗ КАЛЕНДАРЯ
+    function renderMonthSummary() {
+      const today = new Date();
+      const currentYearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+
+      let totalHours = 0;
+      let totalLines = 0;
+      let totalDays = 0;
+
+      for (let key in shifts) {
+        if (key.startsWith(currentYearMonth)) {
+          totalHours += shifts[key].hours;
+          totalLines += shifts[key].lines;
+          totalDays++;
+        }
+      }
+
+      document.getElementById('mTotalDays').textContent = `${totalDays} дн.`;
+      document.getElementById('mTotalHours').textContent = `${totalHours.toFixed(1)} ч`;
+      document.getElementById('mTotalLines').textContent = `${totalLines} стр`;
+
+      const badgeElem = document.getElementById('mStatusBadge');
+      const diffElem = document.getElementById('mDiff');
+
+      if (totalHours > 0) {
+        const avgSpeed = totalLines / totalHours;
+        const diff = avgSpeed - TARGET_SPEED;
+
+        document.getElementById('mAvgSpeed').textContent = `${avgSpeed.toFixed(1)} стр/ч`;
+
+        if (avgSpeed >= TARGET_SPEED) {
+          badgeElem.className = 'status-badge status-ok';
+          badgeElem.textContent = `Месячная норма выполняется! Допуск к премии есть.`;
+          diffElem.textContent = `+${diff.toFixed(1)} стр/ч`;
+          diffElem.style.color = '#4ade80';
+        } else {
+          badgeElem.className = 'status-badge status-bad';
+          const linesNeeded = Math.ceil((TARGET_SPEED * totalHours) - totalLines);
+          badgeElem.textContent = `Отставание от месячной нормы. Не хватает ${linesNeeded} строк.`;
+          diffElem.textContent = `${diff.toFixed(1)} стр/ч`;
+          diffElem.style.color = '#f87171';
+        }
+      } else {
+        document.getElementById('mAvgSpeed').textContent = `0 стр/ч`;
+        diffElem.textContent = `0`;
+        badgeElem.className = 'status-badge';
+        badgeElem.style.background = '#334155';
+        badgeElem.style.color = '#94a3b8';
+        badgeElem.textContent = `Нет сохраненных смен за этот месяц.`;
+      }
+    }
+
+    // ОТРИСОВКА КАЛЕНДАРЯ
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+
+      const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+      document.getElementById('calMonthTitle').textContent = `${monthNames[month]} ${year}`;
+
+      const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+      daysOfWeek.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'cal-day-header';
+        header.textContent = day;
+        grid.appendChild(header);
+      });
+
+      const firstDayOfMonth = new Date(year, month, 1);
+      let startingDay = firstDayOfMonth.getDay() - 1;
+      if (startingDay === -1) startingDay = 6;
+
+      const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
+      const shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+
+      for (let i = 0; i < startingDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cal-cell empty';
+        grid.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= lastDateOfMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        let cellContent = `<span class="cal-date">${day}</span>`;
+
+        if (shifts[dateKey]) {
+          const shift = shifts[dateKey];
+          const isOk = shift.speed >= TARGET_SPEED;
+          cell.classList.add(isOk ? 'ok' : 'bad');
+          cellContent += `<span class="cal-info">${shift.speed.toFixed(1)}/ч<br>${shift.lines}ст</span>`;
+        }
+
+        cell.innerHTML = cellContent;
+        grid.appendChild(cell);
+      }
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Error:', err));
     }
