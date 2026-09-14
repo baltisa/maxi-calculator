@@ -28,16 +28,16 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: 12px;
     }
 
     .card {
       background: #1e293b;
       width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 460px; /* Увеличена ширина карточки */
+      padding: 22px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
       border: 1px solid #334155;
     }
 
@@ -46,11 +46,11 @@
       justify-content: space-between;
       align-items: center;
       background: #0f172a;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 18px;
       border: 1px solid #334155;
-      font-size: 0.85rem;
+      font-size: 0.95rem; /* Увеличен шрифт */
       color: #94a3b8;
       font-weight: 500;
     }
@@ -63,39 +63,40 @@
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .header h1 {
-      font-size: 1.4rem;
+      font-size: 1.6rem; /* Увеличен заголовок */
       color: #38bdf8;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .header p {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       color: #94a3b8;
     }
 
     .tabs {
       display: flex;
       background: #0f172a;
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 20px;
+      border-radius: 12px;
+      padding: 5px;
+      margin-bottom: 22px;
       border: 1px solid #334155;
+      gap: 4px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 12px 6px; /* Увеличены кнопки вкладок */
       text-align: center;
       background: transparent;
       border: none;
       color: #94a3b8;
       font-weight: 600;
-      font-size: 0.85rem;
-      border-radius: 8px;
+      font-size: 0.95rem; /* Увеличен текст вкладок */
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -106,25 +107,25 @@
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.95rem; /* Увеличен текст меток */
       color: #cbd5e1;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       font-weight: 600;
     }
 
     input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px 16px; /* Увеличены поля ввода */
       background: #0f172a;
       border: 1px solid #334155;
-      border-radius: 10px;
+      border-radius: 12px;
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.1rem; /* Увеличен шрифт внутри полей ввода */
       outline: none;
       transition: border-color 0.2s;
     }
@@ -136,17 +137,17 @@
     .add-row {
       display: flex;
       gap: 8px;
-      margin-top: 6px;
+      margin-top: 10px;
     }
 
     .btn-add {
       background: #334155;
       color: #38bdf8;
       border: 1px solid #475569;
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      border-radius: 10px;
+      padding: 12px; /* Увеличены кнопки быстрых надбавок */
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
       flex: 1;
     }
@@ -158,12 +159,12 @@
 
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 16px; /* Увеличен размер основных кнопок */
       background: #0284c7;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 1rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
@@ -178,36 +179,44 @@
       background: #15803d;
     }
 
+    .btn-danger {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #475569;
+    }
+
     .user-banner {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #0f172a;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 18px;
       border: 1px solid #334155;
     }
 
     .user-name {
       font-weight: 600;
       color: #f8fafc;
-      font-size: 0.9rem;
+      font-size: 1rem;
     }
 
     .logout-link {
       color: #ef4444;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       text-decoration: none;
       cursor: pointer;
     }
 
     .results {
-      margin-top: 16px;
+      margin-top: 18px;
       display: none;
       background: #0f172a;
-      padding: 16px;
-      border-radius: 12px;
+      padding: 18px;
+      border-radius: 14px;
       border: 1px solid #334155;
     }
 
@@ -215,7 +224,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .res-row:last-child {
@@ -223,23 +232,23 @@
     }
 
     .res-label {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       color: #94a3b8;
     }
 
     .res-value {
-      font-size: 1rem;
+      font-size: 1.15rem;
       font-weight: bold;
       color: #f8fafc;
     }
 
     .status-badge {
       text-align: center;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 14px;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
 
     .status-ok {
@@ -259,43 +268,45 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 6px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .cal-day-header {
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       color: #94a3b8;
       font-weight: bold;
-      padding-bottom: 4px;
+      padding-bottom: 6px;
     }
 
     .cal-cell {
       background: #0f172a;
       border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 6px 4px;
-      min-height: 48px;
+      border-radius: 10px;
+      padding: 8px 4px;
+      min-height: 56px; /* Увеличены ячейки календаря */
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
+      cursor: pointer;
     }
 
     .cal-cell.empty {
       background: transparent;
       border: none;
+      cursor: default;
     }
 
     .cal-cell.ok {
       border-color: #22c55e;
-      background: rgba(34, 197, 94, 0.1);
+      background: rgba(34, 197, 94, 0.15);
     }
 
     .cal-cell.bad {
       border-color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.15);
     }
 
     .cal-date {
@@ -304,8 +315,42 @@
     }
 
     .cal-info {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: #38bdf8;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    /* Модальное окно редактирования дня */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      width: 100%;
+      max-width: 400px;
+      padding: 22px;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 16px;
       text-align: center;
     }
 
@@ -341,7 +386,7 @@
       
       <div class="user-banner">
         <div>
-          <div style="font-size: 0.75rem; color: #94a3b8;">Сборщик:</div>
+          <div style="font-size: 0.8rem; color: #94a3b8;">Сборщик:</div>
           <div class="user-name" id="displayUserName"></div>
         </div>
         <span class="logout-link" onclick="logout()">Сменить</span>
@@ -394,9 +439,9 @@
         </div>
       </div>
 
-      <!-- Вкладка 2: ИТОГИ МЕСЯЦА (АВТОМАТИЧЕСКИЕ) -->
+      <!-- Вкладка 2: ИТОГИ МЕСЯЦА -->
       <div id="monthTab" class="hidden">
-        <div id="monthResultsBlock" style="background: #0f172a; padding: 16px; border-radius: 12px; border: 1px solid #334155;">
+        <div id="monthResultsBlock" style="background: #0f172a; padding: 18px; border-radius: 14px; border: 1px solid #334155;">
           <div class="res-row">
             <span class="res-label">Отработано дней:</span>
             <span class="res-value" id="mTotalDays">0 дн.</span>
@@ -409,7 +454,7 @@
             <span class="res-label">Всего строк:</span>
             <span class="res-value" id="mTotalLines">0 стр</span>
           </div>
-          <hr style="border: 0; border-top: 1px solid #334155; margin: 12px 0;">
+          <hr style="border: 0; border-top: 1px solid #334155; margin: 14px 0;">
           <div class="res-row">
             <span class="res-label">Средняя скорость:</span>
             <span class="res-value" id="mAvgSpeed">0 стр/ч</span>
@@ -428,7 +473,7 @@
 
       <!-- Вкладка 3: КАЛЕНДАРЬ -->
       <div id="calTab" class="hidden">
-        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #38bdf8;" id="calMonthTitle"></div>
+        <div style="text-align: center; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem; color: #38bdf8;" id="calMonthTitle"></div>
         <div class="calendar-grid" id="calendarGrid"></div>
       </div>
 
@@ -436,9 +481,31 @@
 
   </div>
 
+  <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ДНЯ -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle">Редактирование смены</div>
+      
+      <div class="form-group">
+        <label for="editLines">Собрано строк</label>
+        <input type="number" id="editLines" min="0" placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="editHours">Отработано часов</label>
+        <input type="number" id="editHours" step="0.1" min="0.1" placeholder="например, 8">
+      </div>
+
+      <button type="button" class="btn btn-save" onclick="saveEditedShift()">Сохранить</button>
+      <button type="button" class="btn btn-danger" onclick="deleteEditedShift()">Удалить смену</button>
+      <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
+    </div>
+  </div>
+
   <script>
     const TARGET_SPEED = 40.0;
     let currentShiftData = null;
+    let selectedDateKey = null;
 
     function updateDateTime() {
       const now = new Date();
@@ -551,7 +618,6 @@
       }
     });
 
-    // СОХРАНЕНИЕ СМЕНЫ В КАЛЕНДАРЬ
     function saveShiftToCalendar() {
       if (!currentShiftData) return;
       
@@ -562,10 +628,9 @@
       shifts[dateKey] = currentShiftData;
       
       localStorage.setItem('maxi_shifts', JSON.stringify(shifts));
-      alert('Смена успешно сохранена в календарь и итоговую статистику!');
+      alert('Смена успешно сохранена в календарь!');
     }
 
-    // РАСЧЕТ ИТОГОВ МЕСЯЦА ПО ДАННЫМ ИЗ КАЛЕНДАРЯ
     function renderMonthSummary() {
       const today = new Date();
       const currentYearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
@@ -618,7 +683,6 @@
       }
     }
 
-    // ОТРИСОВКА КАЛЕНДАРЯ
     function renderCalendar() {
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
@@ -667,8 +731,67 @@
         }
 
         cell.innerHTML = cellContent;
+        cell.onclick = () => openEditModal(dateKey, day, monthNames[month]);
         grid.appendChild(cell);
       }
+    }
+
+    /* ФУНКЦИИ МОДАЛЬНОГО ОКНА */
+    function openEditModal(dateKey, day, monthName) {
+      selectedDateKey = dateKey;
+      document.getElementById('modalTitle').textContent = `Смена за ${day} ${monthName}`;
+      
+      const shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+      if (shifts[dateKey]) {
+        document.getElementById('editLines').value = shifts[dateKey].lines;
+        document.getElementById('editHours').value = shifts[dateKey].hours;
+      } else {
+        document.getElementById('editLines').value = '';
+        document.getElementById('editHours').value = '';
+      }
+
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      selectedDateKey = null;
+    }
+
+    function saveEditedShift() {
+      if (!selectedDateKey) return;
+      
+      const lines = parseInt(document.getElementById('editLines').value, 10) || 0;
+      const hours = parseFloat(document.getElementById('editHours').value) || 0;
+
+      let shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+
+      if (hours > 0) {
+        const speed = lines / hours;
+        shifts[selectedDateKey] = { lines, hours, speed };
+        localStorage.setItem('maxi_shifts', JSON.stringify(shifts));
+      } else {
+        delete shifts[selectedDateKey];
+        localStorage.setItem('maxi_shifts', JSON.stringify(shifts));
+      }
+
+      closeEditModal();
+      renderCalendar();
+      renderMonthSummary();
+    }
+
+    function deleteEditedShift() {
+      if (!selectedDateKey) return;
+      
+      let shifts = JSON.parse(localStorage.getItem('maxi_shifts') || '{}');
+      if (shifts[selectedDateKey]) {
+        delete shifts[selectedDateKey];
+        localStorage.setItem('maxi_shifts', JSON.stringify(shifts));
+      }
+
+      closeEditModal();
+      renderCalendar();
+      renderMonthSummary();
     }
 
     if ('serviceWorker' in navigator) {
