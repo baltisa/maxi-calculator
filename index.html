@@ -221,9 +221,27 @@
 
         .day-speed-info {
             font-size: 0.95rem;
-            color: var(--success);
             margin-top: 8px;
             font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .status-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
         }
 
         /* Календарь */
@@ -266,9 +284,14 @@
             border-color: var(--accent);
         }
 
-        .cal-cell.has-data {
+        .cal-cell.success-day {
             border-color: var(--success);
-            background: rgba(34, 197, 94, 0.05);
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .cal-cell.danger-day {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.08);
         }
 
         .cal-day-num {
@@ -276,12 +299,11 @@
         }
 
         .cal-cell-data {
-            color: var(--accent);
+            color: var(--text-main);
             line-height: 1.2;
         }
 
         .cal-cell-speed {
-            color: var(--success);
             font-weight: 600;
         }
 
@@ -368,23 +390,28 @@
         <div class="day-summary-box">
             <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Всего собрано за день:</div>
             <div id="todayTotalLines" class="day-total-lines">0 ст.</div>
-            <div id="todaySpeed" class="day-speed-info">Скорость: 0 ст./час</div>
+            <div id="todaySpeed" class="day-speed-info" style="color: var(--text-muted);">Скорость: —</div>
+            <div id="todayStatusBadge" class="status-badge" style="display: none;"></div>
         </div>
     </div>
 
     <!-- Вкладка 2: Итоги месяца -->
     <div id="view-stats" class="view-content">
-        <div class="card-box" style="text-align: center; padding: 20px;">
+        <div class="card-box" style="text-align: center; padding: 18px;">
             <div style="color: var(--text-muted); margin-bottom: 6px;">Собрано строк за месяц</div>
-            <div id="monthTotalLines" style="font-size: 2rem; font-weight: bold; color: var(--accent);">0 ст.</div>
+            <div id="monthTotalLines" style="font-size: 1.8rem; font-weight: bold; color: var(--accent);">0 ст.</div>
         </div>
-        <div class="card-box" style="text-align: center; padding: 20px;">
+        <div class="card-box" style="text-align: center; padding: 18px;">
             <div style="color: var(--text-muted); margin-bottom: 6px;">Отработано часов за месяц</div>
-            <div id="monthTotalHours" style="font-size: 2rem; font-weight: bold; color: var(--success);">0 ч.</div>
+            <div id="monthTotalHours" style="font-size: 1.8rem; font-weight: bold; color: var(--success);">0 ч.</div>
         </div>
-        <div class="card-box" style="text-align: center; padding: 20px;">
+        <div class="card-box" style="text-align: center; padding: 18px;">
             <div style="color: var(--text-muted); margin-bottom: 6px;">Средняя скорость за месяц</div>
-            <div id="monthAvgSpeed" style="font-size: 1.8rem; font-weight: bold; color: var(--success);">0 ст./час</div>
+            <div id="monthAvgSpeed" style="font-size: 1.6rem; font-weight: bold; color: var(--text-main);">0 ст./час</div>
+        </div>
+        <div class="card-box" style="text-align: center; padding: 18px;">
+            <div style="color: var(--text-muted); margin-bottom: 6px;">Дней с выполненной нормой (&ge; 40)</div>
+            <div id="monthSuccessDays" style="font-size: 1.6rem; font-weight: bold; color: var(--success);">0 / 0</div>
         </div>
     </div>
 
@@ -420,6 +447,8 @@
 </div>
 
 <script>
+    const NORM_SPEED = 40; // Норма для премии
+
     let currentCollector = localStorage.getItem('maxi_collector') || 'Алексей';
     document.getElementById('currentCollectorName').textContent = currentCollector;
 
@@ -475,12 +504,26 @@
         document.getElementById('todayTotalLines').textContent = lines + ' ст.';
         
         let speedEl = document.getElementById('todaySpeed');
+        let badgeEl = document.getElementById('todayStatusBadge');
+
         if (hours > 0) {
             let speed = (lines / hours).toFixed(1);
             speedEl.textContent = `Скорость: ${speed} ст./час`;
-            speedEl.style.display = 'block';
+            
+            badgeEl.style.display = 'inline-block';
+            if (speed >= NORM_SPEED) {
+                speedEl.style.color = 'var(--success)';
+                badgeEl.textContent = `✅ Норма выполнена (≥ ${NORM_SPEED})`;
+                badgeEl.className = 'status-badge status-success';
+            } else {
+                speedEl.style.color = 'var(--danger)';
+                badgeEl.textContent = `❌ Норма не выполнена (< ${NORM_SPEED})`;
+                badgeEl.className = 'status-badge status-danger';
+            }
         } else {
-            speedEl.textContent = 'Скорость: — (введите часы)';
+            speedEl.textContent = 'Скорость: — (введите отработанные часы)';
+            speedEl.style.color = 'var(--text-muted)';
+            badgeEl.style.display = 'none';
         }
     }
 
@@ -523,28 +566,51 @@
         updateDayDisplay(data.lines, hoursVal);
     }
 
-    // Подсчет итогов и средней скорости за месяц
+    // Итоги месяца и статистика по премии
     function updateStats() {
         let totalLines = 0;
         let totalHours = 0;
+        let workedDaysCount = 0;
+        let successDaysCount = 0;
 
         for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i);
             if (key.startsWith('maxi_data_')) {
                 let val = JSON.parse(localStorage.getItem(key));
-                totalLines += val.lines || 0;
-                totalHours += val.hours || 0;
+                let lines = val.lines || 0;
+                let hours = val.hours || 0;
+
+                if (lines > 0 || hours > 0) {
+                    totalLines += lines;
+                    totalHours += hours;
+                    
+                    if (hours > 0) {
+                        workedDaysCount++;
+                        let speed = lines / hours;
+                        if (speed >= NORM_SPEED) {
+                            successDaysCount++;
+                        }
+                    }
+                }
             }
         }
 
         let avgSpeed = totalHours > 0 ? (totalLines / totalHours).toFixed(1) : 0;
+        let avgSpeedEl = document.getElementById('monthAvgSpeed');
+        avgSpeedEl.textContent = avgSpeed + ' ст./час';
+        
+        if (totalHours > 0) {
+            avgSpeedEl.style.color = avgSpeed >= NORM_SPEED ? 'var(--success)' : 'var(--danger)';
+        } else {
+            avgSpeedEl.style.color = 'var(--text-main)';
+        }
 
         document.getElementById('monthTotalLines').textContent = totalLines + ' ст.';
         document.getElementById('monthTotalHours').textContent = totalHours + ' ч.';
-        document.getElementById('monthAvgSpeed').textContent = avgSpeed + ' ст./час';
+        document.getElementById('monthSuccessDays').textContent = `${successDaysCount} из ${workedDaysCount}`;
     }
 
-    // Рендер календаря с отображением скорости в ячейках
+    // Рендер календаря с подсветкой (зеленый / красный)
     function renderCalendar() {
         let grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
@@ -583,15 +649,28 @@
 
             let cell = document.createElement('div');
             cell.className = 'cal-cell';
+
             if (data.lines > 0 || data.hours > 0) {
-                cell.classList.add('has-data');
+                if (data.hours > 0) {
+                    let speed = data.lines / data.hours;
+                    if (speed >= NORM_SPEED) {
+                        cell.classList.add('success-day');
+                    } else {
+                        cell.classList.add('danger-day');
+                    }
+                } else {
+                    // Если часы не указаны, но строки есть — считаем нейтральным или подсвечиваем по строкам
+                    cell.classList.add('danger-day');
+                }
             }
 
             let html = `<div class="cal-day-num">${day}</div>`;
             if (data.lines > 0 || data.hours > 0) {
                 let daySpeed = data.hours > 0 ? (data.lines / data.hours).toFixed(1) : '—';
-                html += `<div class="cal-cell-data">${data.lines} ст<br>${data.hours} ч</div>`;
-                html += `<div class="cal-cell-speed">${daySpeed} ст/ч</div>`;
+                let speedColor = data.hours > 0 && (data.lines / data.hours) >= NORM_SPEED ? 'var(--success)' : 'var(--danger)';
+                
+                html += `<div class="cal-cell-data">${data.lines}ст<br>${data.hours}ч</div>`;
+                html += `<div class="cal-cell-speed" style="color: ${speedColor};">${daySpeed} с/ч</div>`;
             } else {
                 html += `<div></div><div></div>`;
             }
