@@ -1,18 +1,8 @@
-const CACHE_NAME = 'maxi-picker-v2';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
-
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  console.log('Service Worker установлен');
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
+  // Базовый перехват запросов для работы PWA
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
