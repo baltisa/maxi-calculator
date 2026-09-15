@@ -253,13 +253,13 @@
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            min-height: 65px;
-            padding: 6px;
+            min-height: 75px;
+            padding: 5px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .cal-cell:hover {
@@ -276,9 +276,13 @@
         }
 
         .cal-cell-data {
-            font-size: 0.7rem;
             color: var(--accent);
-            line-height: 1.1;
+            line-height: 1.2;
+        }
+
+        .cal-cell-speed {
+            color: var(--success);
+            font-weight: 600;
         }
 
         /* Модальное окно */
@@ -333,7 +337,7 @@
         <div class="tab-btn" onclick="switchTab('calendar')">Календарь</div>
     </div>
 
-    <!-- Вкладка 1: Смена (Добавление заказов в течение дня) -->
+    <!-- Вкладка 1: Смена -->
     <div id="view-shift" class="view-content active">
         <div class="card-box">
             <label for="workDate">Дата смены:</label>
@@ -346,7 +350,6 @@
                 <input type="number" id="addLinesInput" placeholder="Кол-во строк (например, 15)" inputmode="numeric">
             </div>
             
-            <!-- Быстрые кнопки добавления -->
             <div class="quick-btns">
                 <button class="quick-btn" onclick="addQuick(+5)">+5</button>
                 <button class="quick-btn" onclick="addQuick(+10)">+10</button>
@@ -371,13 +374,17 @@
 
     <!-- Вкладка 2: Итоги месяца -->
     <div id="view-stats" class="view-content">
-        <div class="card-box" style="text-align: center; padding: 25px;">
-            <div style="color: var(--text-muted); margin-bottom: 8px;">Собрано строк за месяц</div>
-            <div id="monthTotalLines" style="font-size: 2.2rem; font-weight: bold; color: var(--accent);">0 ст.</div>
+        <div class="card-box" style="text-align: center; padding: 20px;">
+            <div style="color: var(--text-muted); margin-bottom: 6px;">Собрано строк за месяц</div>
+            <div id="monthTotalLines" style="font-size: 2rem; font-weight: bold; color: var(--accent);">0 ст.</div>
         </div>
-        <div class="card-box" style="text-align: center; padding: 25px;">
-            <div style="color: var(--text-muted); margin-bottom: 8px;">Отработано часов за месяц</div>
-            <div id="monthTotalHours" style="font-size: 2.2rem; font-weight: bold; color: var(--success);">0 ч.</div>
+        <div class="card-box" style="text-align: center; padding: 20px;">
+            <div style="color: var(--text-muted); margin-bottom: 6px;">Отработано часов за месяц</div>
+            <div id="monthTotalHours" style="font-size: 2rem; font-weight: bold; color: var(--success);">0 ч.</div>
+        </div>
+        <div class="card-box" style="text-align: center; padding: 20px;">
+            <div style="color: var(--text-muted); margin-bottom: 6px;">Средняя скорость за месяц</div>
+            <div id="monthAvgSpeed" style="font-size: 1.8rem; font-weight: bold; color: var(--success);">0 ст./час</div>
         </div>
     </div>
 
@@ -394,7 +401,7 @@
     </div>
 </div>
 
-<!-- Модальное окно редактирования дня из календаря -->
+<!-- Модальное окно редактирования дня -->
 <div class="modal-overlay" id="editModal">
     <div class="modal-card">
         <div class="modal-title" id="modalDateTitle">Редактировать день</div>
@@ -413,18 +420,15 @@
 </div>
 
 <script>
-    // Инициализация данных в localStorage
     let currentCollector = localStorage.getItem('maxi_collector') || 'Алексей';
     document.getElementById('currentCollectorName').textContent = currentCollector;
 
-    // Установка сегодняшней даты по умолчанию
     const todayStr = new Date().toISOString().split('T')[0];
     document.getElementById('workDate').value = todayStr;
 
     let selectedModalDate = null;
     let currentCalDate = new Date();
 
-    // Загрузка данных при старте
     loadDayData();
 
     function changeName() {
@@ -454,7 +458,6 @@
         }
     }
 
-    // Получить ключ хранения для конкретной даты
     function getKey(dateStr) {
         return `maxi_data_${dateStr}`;
     }
@@ -468,7 +471,6 @@
         localStorage.setItem(getKey(dateStr), JSON.stringify({ lines: Number(lines), hours: Number(hours) }));
     }
 
-    // Функция пересчета и отображения итогов и скорости за день
     function updateDayDisplay(lines, hours) {
         document.getElementById('todayTotalLines').textContent = lines + ' ст.';
         
@@ -482,7 +484,6 @@
         }
     }
 
-    // Работа со вкладкой смены
     function loadDayData() {
         let dateStr = document.getElementById('workDate').value;
         let data = getDayData(dateStr);
@@ -505,13 +506,11 @@
         let data = getDayData(dateStr);
         data.lines += addVal;
 
-        // Автоматически сохраняем часы, если они введены
         let hoursVal = Number(document.getElementById('workHoursInput').value) || data.hours;
         data.hours = hoursVal;
 
         saveDayData(dateStr, data.lines, data.hours);
         
-        // Очищаем поле ввода заказа и обновляем экран
         document.getElementById('addLinesInput').value = '';
         updateDayDisplay(data.lines, data.hours);
     }
@@ -524,7 +523,7 @@
         updateDayDisplay(data.lines, hoursVal);
     }
 
-    // Подсчет итогов месяца
+    // Подсчет итогов и средней скорости за месяц
     function updateStats() {
         let totalLines = 0;
         let totalHours = 0;
@@ -538,11 +537,14 @@
             }
         }
 
+        let avgSpeed = totalHours > 0 ? (totalLines / totalHours).toFixed(1) : 0;
+
         document.getElementById('monthTotalLines').textContent = totalLines + ' ст.';
         document.getElementById('monthTotalHours').textContent = totalHours + ' ч.';
+        document.getElementById('monthAvgSpeed').textContent = avgSpeed + ' ст./час';
     }
 
-    // Рендер календаря
+    // Рендер календаря с отображением скорости в ячейках
     function renderCalendar() {
         let grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
@@ -553,7 +555,6 @@
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         document.getElementById('calendarMonthTitle').textContent = `${monthNames[month]} ${year}`;
 
-        // Дни недели
         const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         daysOfWeek.forEach(d => {
             let div = document.createElement('div');
@@ -563,18 +564,16 @@
         });
 
         let firstDayIndex = new Date(year, month, 1).getDay();
-        firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; // Коррекция под понедельник
+        firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
 
         let totalDays = new Date(year, month + 1, 0).getDate();
 
-        // Пустые ячейки до начала месяца
         for (let i = 0; i < firstDayIndex; i++) {
             let div = document.createElement('div');
             div.style.opacity = '0.2';
             grid.appendChild(div);
         }
 
-        // Дни месяца
         for (let day = 1; day <= totalDays; day++) {
             let mStr = String(month + 1).padStart(2, '0');
             let dStr = String(day).padStart(2, '0');
@@ -590,9 +589,11 @@
 
             let html = `<div class="cal-day-num">${day}</div>`;
             if (data.lines > 0 || data.hours > 0) {
-                html += `<div class="cal-cell-data">${data.lines} ст.<br>${data.hours} ч.</div>`;
+                let daySpeed = data.hours > 0 ? (data.lines / data.hours).toFixed(1) : '—';
+                html += `<div class="cal-cell-data">${data.lines} ст<br>${data.hours} ч</div>`;
+                html += `<div class="cal-cell-speed">${daySpeed} ст/ч</div>`;
             } else {
-                html += `<div></div>`;
+                html += `<div></div><div></div>`;
             }
             cell.innerHTML = html;
 
@@ -606,7 +607,6 @@
         renderCalendar();
     }
 
-    // Модальное окно
     function openModal(dateStr) {
         selectedModalDate = dateStr;
         let data = getDayData(dateStr);
