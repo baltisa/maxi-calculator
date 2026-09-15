@@ -203,7 +203,7 @@
             color: var(--accent);
         }
 
-        /* Индикатор итогов за день */
+        /* Индикатор итогов за день и скорости */
         .day-summary-box {
             background: rgba(56, 189, 248, 0.05);
             border: 1px dashed var(--accent);
@@ -217,6 +217,13 @@
             font-size: 1.8rem;
             font-weight: bold;
             color: var(--accent);
+        }
+
+        .day-speed-info {
+            font-size: 0.95rem;
+            color: var(--success);
+            margin-top: 8px;
+            font-weight: 600;
         }
 
         /* Календарь */
@@ -358,6 +365,7 @@
         <div class="day-summary-box">
             <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Всего собрано за день:</div>
             <div id="todayTotalLines" class="day-total-lines">0 ст.</div>
+            <div id="todaySpeed" class="day-speed-info">Скорость: 0 ст./час</div>
         </div>
     </div>
 
@@ -460,13 +468,27 @@
         localStorage.setItem(getKey(dateStr), JSON.stringify({ lines: Number(lines), hours: Number(hours) }));
     }
 
+    // Функция пересчета и отображения итогов и скорости за день
+    function updateDayDisplay(lines, hours) {
+        document.getElementById('todayTotalLines').textContent = lines + ' ст.';
+        
+        let speedEl = document.getElementById('todaySpeed');
+        if (hours > 0) {
+            let speed = (lines / hours).toFixed(1);
+            speedEl.textContent = `Скорость: ${speed} ст./час`;
+            speedEl.style.display = 'block';
+        } else {
+            speedEl.textContent = 'Скорость: — (введите часы)';
+        }
+    }
+
     // Работа со вкладкой смены
     function loadDayData() {
         let dateStr = document.getElementById('workDate').value;
         let data = getDayData(dateStr);
-        document.getElementById('todayTotalLines').textContent = data.lines + ' ст.';
         document.getElementById('workHoursInput').value = data.hours || '';
         document.getElementById('addLinesInput').value = '';
+        updateDayDisplay(data.lines, data.hours);
     }
 
     function addQuick(val) {
@@ -491,7 +513,7 @@
         
         // Очищаем поле ввода заказа и обновляем экран
         document.getElementById('addLinesInput').value = '';
-        document.getElementById('todayTotalLines').textContent = data.lines + ' ст.';
+        updateDayDisplay(data.lines, data.hours);
     }
 
     function saveHours() {
@@ -499,6 +521,7 @@
         let hoursVal = Number(document.getElementById('workHoursInput').value) || 0;
         let data = getDayData(dateStr);
         saveDayData(dateStr, data.lines, hoursVal);
+        updateDayDisplay(data.lines, hoursVal);
     }
 
     // Подсчет итогов месяца
