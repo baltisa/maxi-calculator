@@ -178,6 +178,15 @@
             color: #fff;
         }
 
+        .btn-success {
+            background: var(--success);
+            color: #0f172a;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+            color: #fff;
+        }
+
         .btn-secondary {
             background: #334155;
             color: var(--text-main);
@@ -250,6 +259,20 @@
         .status-danger {
             background: rgba(239, 68, 68, 0.15);
             color: var(--danger);
+        }
+
+        /* Уведомление о сохранении */
+        .save-toast {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: none;
         }
 
         /* Календарь */
@@ -350,7 +373,7 @@
             margin-top: 15px;
         }
 
-        /* Стили для кнопки установки PWA */
+        /* Стили для установки PWA */
         #install-container {
             margin-top: 15px;
             text-align: center;
@@ -437,6 +460,11 @@
         <div class="card-box">
             <label for="workHoursInput">Отработано часов за день:</label>
             <input type="number" id="workHoursInput" placeholder="Часы (например, 8)" inputmode="decimal" oninput="saveHours()">
+        </div>
+
+        <div class="card-box" style="padding: 10px; background: transparent; border: none;">
+            <button class="btn-main btn-success" onclick="saveCurrentShift()">💾 Сохранить смену</button>
+            <div id="saveToast" class="save-toast">✅ Смена успешно сохранена!</div>
         </div>
 
         <div class="day-summary-box">
@@ -652,6 +680,24 @@
         let data = getDayData(dateStr);
         saveDayData(dateStr, data.lines, hoursVal);
         updateDayDisplay(data.lines, hoursVal);
+    }
+
+    // Функция ручного принудительного сохранения смены с уведомлением
+    function saveCurrentShift() {
+        let dateStr = document.getElementById('workDate').value;
+        let hoursVal = Number(document.getElementById('workHoursInput').value) || 0;
+        let data = getDayData(dateStr);
+        
+        // Перезаписываем актуальные данные из полей
+        saveDayData(dateStr, data.lines, hoursVal);
+        updateDayDisplay(data.lines, hoursVal);
+
+        // Показываем красивое всплывающее подтверждение на 2 секунды
+        let toast = document.getElementById('saveToast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2000);
     }
 
     function updateStats() {
