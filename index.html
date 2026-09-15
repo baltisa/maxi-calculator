@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор Сборщика Maxi</title>
+    
+    <!-- PWA Manifest & Meta -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#38bdf8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Maxi Calc">
+
     <style>
         :root {
             --bg-color: #0f172a;
@@ -341,6 +349,42 @@
             gap: 10px;
             margin-top: 15px;
         }
+
+        /* Стили для кнопки установки PWA */
+        #install-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .install-btn {
+            background-color: var(--success);
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            display: none;
+            margin-bottom: 10px;
+        }
+
+        #ios-install-tip {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        #ios-install-tip span {
+            color: var(--text-main);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -350,6 +394,14 @@
     <div class="header">
         <div class="collector-info">Сборщик: <span id="currentCollectorName" class="collector-name">Алексей</span></div>
         <button class="btn-small" onclick="changeName()">Сменить</button>
+    </div>
+
+    <!-- Кнопка и подсказка установки PWA -->
+    <div id="install-container">
+        <button id="install-btn" class="install-btn">📲 Установить на главный экран</button>
+        <div id="ios-install-tip">
+            Для установки на iPhone/iPad: нажмите <span>«Поделиться»</span> внизу браузера, затем <span>«На экран "Домой"»</span>.
+        </div>
     </div>
 
     <!-- Навигация -->
@@ -447,6 +499,42 @@
 </div>
 
 <script>
+    // --- PWA INSTALL LOGIC ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+        });
+    }
+
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        }
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+    });
+
+    // iOS check
+    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isIos && !isInStandaloneMode) {
+        document.getElementById('ios-install-tip').style.display = 'block';
+    }
+
+
+    // --- APP LOGIC ---
     const NORM_SPEED = 40; // Норма для премии
 
     let currentCollector = localStorage.getItem('maxi_collector') || 'Алексей';
@@ -566,7 +654,6 @@
         updateDayDisplay(data.lines, hoursVal);
     }
 
-    // Итоги месяца и статистика по премии
     function updateStats() {
         let totalLines = 0;
         let totalHours = 0;
@@ -610,7 +697,6 @@
         document.getElementById('monthSuccessDays').textContent = `${successDaysCount} из ${workedDaysCount}`;
     }
 
-    // Рендер календаря с подсветкой (зеленый / красный)
     function renderCalendar() {
         let grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
@@ -659,7 +745,6 @@
                         cell.classList.add('danger-day');
                     }
                 } else {
-                    // Если часы не указаны, но строки есть — считаем нейтральным или подсвечиваем по строкам
                     cell.classList.add('danger-day');
                 }
             }
